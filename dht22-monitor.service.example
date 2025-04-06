@@ -1,0 +1,21 @@
+[Unit]
+Description=DHT22 Room Monitor Service
+After=network.target
+# Add a delay for MQTT
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=micheled9
+WorkingDirectory=<your-fs-path>/rpi_sensors
+Environment=PYTHONUNBUFFERED=1
+# Add a small delay to ensure MQTT is rnning
+ExecStartPre=/bin/bash -c 'while ! nc -z localhost 1883; do sleep 1; done'
+ExecStart=<your-fs-path>/rpi_sensors/venv/bin/python <your-fs-path>/rpi_sensors/sensors.py
+Restart=always
+# Increased restart delay
+RestartSec=20
+
+[Install]
+WantedBy=multi-user.target 

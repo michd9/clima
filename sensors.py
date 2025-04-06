@@ -45,7 +45,7 @@ class SensorFilter:
         return round(avg_temp), round(avg_humidity)
     
     def is_stable(self) -> bool:
-        """Check if enough readings have been collected for stable output."""
+        """Check if enough readings have been collected."""
         return len(self.temp_buffer) == self.window_size
 
 # Initialize the sensor filter
@@ -94,24 +94,15 @@ def publish_sensor_data():
             ]
             publish.multiple(msgs, hostname=MQTT_BROKER, port=MQTT_PORT, client_id="serverS")
         else:
-            print("Collecting initial readings for stable filter output...")
+            print("Collecting initial readings...")
 
 def start_sensor_monitoring():
     """Start periodic sensor monitoring and MQTT publishing.
-    
-    Uses a 30-second interval optimized for room environment monitoring:
-    - Provides stable readings for typical indoor changes
-    - Reduces system resource usage
-    - Accounts for DHT22 sensor characteristics
-    - Maintains good battery life for battery-powered setups
+
     """
     print("Starting DHT22 room monitoring")
-    print("Initializing filter with window size of 5 readings...")
+    print("Initializing filter with window size 5...")
     
-    # 30 seconds is optimal for room monitoring:
-    # - Temperature changes in rooms are typically gradual
-    # - Humidity changes are also relatively slow in indoor environments
-    # - Reduces unnecessary readings while maintaining accuracy
     schedule.every(30).seconds.do(publish_sensor_data)
     
     while True:
